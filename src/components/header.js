@@ -28,7 +28,8 @@ const styles = {
         shadowOpacity: 0.2
     },
     textStyle: {
-        fontSize: 20
+        fontSize: 20,
+        color: 'black'
     }
 };
 
