@@ -1,9 +1,11 @@
 import React from 'react';
 import { View } from 'react-native';
 
-const Card = () => {
+const Card = (props) => {
     return (
-        <View style={styles.containerStyle}></View>
+        <View style={styles.containerStyle}>
+            {props.children}
+        </View>
     );
 };
 
@@ -20,7 +22,7 @@ const styles = {
         elevation: 1,
         marginLeft: 5,
         marginRight: 5,
-        marginTop: 1
+        marginTop: 10
     }
 };
 
