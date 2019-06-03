@@ -1,35 +1,14 @@
 import React, { Component } from 'react';
 import { View, TextInput } from 'react-native';
-import axios from 'axios';
 import AlbumList from './AlbumList';
 
 class Search extends Component {
-    state = { albums: [], searchText: '', token: '' };
+    state = { albums: [], searchText: 'Sempiternal', token: '' };
 
-    componentWillMount() {
-        const clientId = 'affcdb4085694b5389bbe89724470c13';
-        const clientSecret = '1a7be4ff887c4943a7abc2d5be15ce6d';
+    albumSearch(text) {
         const encoded = 'YWZmY2RiNDA4NTY5NGI1Mzg5YmJlODk3MjQ0NzBjMTM6MWE3YmU0ZmY4ODdjNDk0M2E3YWJjMmQ1YmUxNWNlNmQ='
-        const redirectUri = 'localhost:8888/callback';
-        var accessToken = '';
-        
-        /*axios({
-            method: 'post',
-            url: 'https://accounts.spotify.com/api/token',
-            headers: { 
-                'Content-Type': 'application/x-www-form-urlencoded',
-                Authorization: `Basic ${encoded}`
-            },
-            data: JSON.stringify({
-                grant_type: 'client_credentials'
-            }),
-        }).then(response => { console.log(response.data); })
-        .catch(error => {
-            console.log(error);
-        });
-        */
-        const data = { grant_type: 'client_credentials' };
 
+        const data = { grant_type: 'client_credentials' };
 
         const formBody = Object.keys(data).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key])).join('&');
 
@@ -41,24 +20,32 @@ class Search extends Component {
             },
             body: formBody
         }).then((response) => response.json())
-        .then((responseJson) => { console.log(responseJson)})
+        .then((responseJson) => { this.setState({ token: responseJson.access_token }); })
+        .then(() => 
+            fetch(`https://api.spotify.com/v1/search?q=album:${text}&type=album`, {
+                method: 'get',
+                headers: {
+                    Authorization: `Bearer ${this.state.token}`
+                }
+            })
+        .then((response) => response.json())
+        .then((responseJson) => { this.setState({ albums: responseJson }); })
+        .then(
+            <AlbumList albums={this.state.albums.albums} />
+        )
         .catch(error => {
             console.log(error);
-        });
-
-        //axios.get(`https://api.spotify.com/v1/search?q=album:${this.state.searchText}&type=album`, config)
-        //.then(response => this.setState({ albums: response.data }));
+        }));
     }
 
-
     render() {
-        console.log();
+        console.log(this.state.albums.albums);
         return (
         <View style={styles.InputCardStyle}>
             <TextInput 
                 style={styles.InputStyle}
                 placeholder="Search an album"
-                onChangeText={(text) => this.setState({ searchText: text })}
+                onSubmitEditing={(event) => this.albumSearch(event.nativeEvent.text)} 
             />
         </View>
         );
